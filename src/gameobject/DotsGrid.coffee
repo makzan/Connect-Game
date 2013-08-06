@@ -13,7 +13,7 @@ class DotsGrid extends ui.View
 
 		@margin = 30
 
-		@dot_width = 25
+		@dot_width = 40
 		@dot_height = @dot_width		
 		grid_width = Setting.game_width - @margin * 2
 		@dot_col_space = (grid_width - @columns * @dot_width) / (@columns - 1)

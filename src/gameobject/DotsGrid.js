@@ -21,7 +21,7 @@
       this.columns = 5;
       this.rows = 5;
       this.margin = 30;
-      this.dot_width = 25;
+      this.dot_width = 40;
       this.dot_height = this.dot_width;
       grid_width = Setting.game_width - this.margin * 2;
       this.dot_col_space = (grid_width - this.columns * this.dot_width) / (this.columns - 1);
