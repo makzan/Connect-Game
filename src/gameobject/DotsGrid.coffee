@@ -3,6 +3,8 @@
 `import src.Setting as Setting`
 `import animate`
 
+# TODO:
+# To be refractored to separated view and logic/data
 class DotsGrid extends ui.View
 	init: (opts) ->
 
@@ -67,8 +69,8 @@ class DotsGrid extends ui.View
 		return dot
 
 	finish_selection: ->
-		# console.log "Finish selection"
-
+		count = @selected_dots.length
+		@emit "score:update", count		
 		# remove all dots
 		console.log "--------------------------"
 		for dot in @selected_dots

@@ -71,7 +71,9 @@
     };
 
     DotsGrid.prototype.finish_selection = function() {
-      var dot, _i, _len, _ref1;
+      var count, dot, _i, _len, _ref1;
+      count = this.selected_dots.length;
+      this.emit("score:update", count);
       console.log("--------------------------");
       _ref1 = this.selected_dots;
       for (_i = 0, _len = _ref1.length; _i < _len; _i++) {

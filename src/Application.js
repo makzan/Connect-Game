@@ -18,7 +18,8 @@
     }
 
     Game.prototype.initUI = function() {
-      var bg;
+      var bg, dot_grid, score_text,
+        _this = this;
       bg = new View({
         superview: this,
         width: Setting.game_width,
@@ -32,10 +33,40 @@
         this.style.x = device.width / 2 / GC.app.view.style.scale - Setting.game_width / 2;
         this.style.y = device.height / 2 / GC.app.view.style.scale - Setting.game_height / 2;
       }
-      return new DotsGrid({
+      dot_grid = new DotsGrid({
         superview: this,
         x: 0,
         y: 0
+      });
+      dot_grid.on("score:update", function(count) {
+        var text;
+        _this.score += Math.pow(2, count - 1);
+        text = _this.score + "";
+        if (text.length === 1) {
+          text = "0000" + text;
+        }
+        if (text.length === 2) {
+          text = "000" + text;
+        }
+        if (text.length === 3) {
+          text = "00" + text;
+        }
+        if (text.length === 4) {
+          text = "0" + text;
+        }
+        return score_text.setText(text);
+      });
+      this.score = 0;
+      return score_text = new TextView({
+        superview: this,
+        x: 4,
+        y: 4,
+        width: Setting.game_width,
+        height: 20,
+        horizontalAlign: "left",
+        text: "00000",
+        size: 24,
+        color: '#222222'
       });
     };
 
