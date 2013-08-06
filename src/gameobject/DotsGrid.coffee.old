@@ -1,0 +1,114 @@
+`import ui.View`
+`import src.gameobject.Dot as Dot`
+`import src.Setting as Setting`
+`import math.util`
+
+class DotsGrid extends ui.View
+	init: (opts) ->
+
+		@columns = 5
+		@rows = 5
+		dot_width = 25
+		@dot_height = dot_width		
+		grid_width = opts.width
+		dot_col_space = (grid_width - @columns * dot_width) / (@columns - 1)
+		@dot_row_space = dot_col_space
+		grid_height = @rows * (@dot_row_space + @dot_height)
+
+		opts = merge opts,
+			x: 0
+			y: 0
+			width: Setting.game_width
+			height: grid_height
+
+		super opts
+
+		@data = []
+		@dots_array = []
+
+		@current_pattern = undefined
+		@selected_dots = []
+
+		that = this
+
+		for i in [0...@columns]
+			@data[i] = []
+			@dots_array[i] = []
+			for j in [0...@rows]
+				pattern = math.util.random(0, Dot.patterns.length)
+
+				# for data array
+				@data[i].push pattern
+
+				# for visual
+				dot = new Dot i, j, pattern, 
+					superview: @
+					x: i * (dot_col_space + dot_width)
+					y: j * (@dot_row_space + @dot_height)
+					width: dot_width
+					height: @dot_height					
+				dot.on "InputOver", (over, overCount, atTarget) ->
+					that.select_dot @
+
+				@dots_array[i].push dot
+
+		@on "InputSelect", @finish_selection
+		return yes
+
+	finish_selection: ->
+		console.log "Finish selection"
+
+		# remove all dots
+		for dot in @selected_dots
+			# in data
+			@data[dot.grid_i][dot.grid_j] = -1			
+
+			# visually
+			dot.removeFromSuperview()
+		@selected_dots.length = 0
+
+		for i in [0..@rows]
+			@fall_dots()
+
+	fall_dots: ->
+		# data: fall the dots
+		for i in [0...@columns]
+			for j in [@rows...0]
+				if @data[i][j] < 0
+					for k in [0...@rows]
+						if @data[i][j-k] >= 0
+							break
+					dot = @dots_array[i][j-k]
+					dot.grid_j = j
+		for i of @dots_array
+			@data[i].length = 0
+			for j of @dots_array[i]
+				@data[i].push @dots_array[i][j].pattern_no
+
+		# visual: fall the dots
+		for i of @dots_array
+			for j of @dots_array[i]
+				dot = @dots_array[i][j]
+				dot.style.y = dot.grid_j * (@dot_row_space + @dot_height)
+
+
+
+
+
+
+	select_dot: (dot) ->
+		is_adjacent = (dot1, dot2) ->
+			return no if dot1 == dot2
+			return yes if dot1.grid_i == dot2.grid_i && Math.abs(dot1.grid_j - dot2.grid_j) == 1
+			return yes if dot1.grid_j == dot2.grid_j && Math.abs(dot1.grid_i - dot2.grid_i) == 1
+			return no
+
+		console.log "Selected dot:", dot.grid_i, dot.grid_j, dot.pattern_no, "current pattern:", @current_pattern
+		if @selected_dots.length == 0
+			@current_pattern = dot.pattern_no
+			@selected_dots.push dot
+		else if @current_pattern == dot.pattern_no
+			if is_adjacent(dot, @selected_dots[@selected_dots.length - 1])
+				@selected_dots.push dot
+
+`exports = DotsGrid`
