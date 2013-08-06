@@ -54,8 +54,7 @@ class DotsGrid extends ui.View
 				@dots_array[i].push dot
 
 		@on "InputSelect", @finish_selection
-		return yes
-
+		return yes	
 	create_new_dot: (i, j, pattern) ->
 		that = this
 		dot = new Dot i, j, pattern, 

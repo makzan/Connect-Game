@@ -40,7 +40,7 @@
       });
       dot_grid.on("score:update", function(count) {
         var text;
-        _this.score += Math.pow(2, count - 1);
+        _this.score += Math.floor(Math.pow(2, count - 1));
         text = _this.score + "";
         if (text.length === 1) {
           text = "0000" + text;
@@ -57,17 +57,56 @@
         return score_text.setText(text);
       });
       this.score = 0;
-      return score_text = new TextView({
+      score_text = new TextView({
         superview: this,
-        x: 4,
+        x: 6,
         y: 4,
-        width: Setting.game_width,
+        width: Setting.game_width / 2,
         height: 20,
         horizontalAlign: "left",
         text: "00000",
         size: 24,
         color: '#222222'
       });
+      this.timer = 60;
+      this.timer_text = new TextView({
+        superview: this,
+        x: Setting.game_width / 2,
+        y: 4,
+        width: Setting.game_width / 2 - 6,
+        height: 20,
+        horizontalAlign: "right",
+        text: this.timer + "",
+        size: 24,
+        color: '#222222'
+      });
+      return this.tick_time = 0;
+    };
+
+    Game.prototype.update_timer = function() {
+      this.timer -= 1;
+      if (this.timer <= 0) {
+        GC.app.engine.stopLoop();
+      }
+      this.timer_text.setText(this.timer);
+      if (this.timer < 15) {
+        this.timer_text.updateOpts({
+          color: '#db8200'
+        });
+      }
+      if (this.timer < 10) {
+        return this.timer_text.updateOpts({
+          color: '#db2300'
+        });
+      }
+    };
+
+    Game.prototype.tick = function(dt) {
+      this.tick_time += dt;
+      if (this.tick_time > 1000) {
+        this.tick_time = 0;
+        return this.update_timer();
+      }
     };
 
     Game.prototype.launchUI = function() {

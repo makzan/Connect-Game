@@ -25,7 +25,7 @@ class Game extends GC.Application
 			x: 0
 			y: 0
 		dot_grid.on "score:update", (count) =>
-			@score += Math.pow(2, count-1)
+			@score += Math.floor(Math.pow(2, count-1)) # score is 2^(count-1)
 			text = @score + ""
 			text = "0000" + text if text.length == 1
 			text = "000" + text if text.length == 2
@@ -37,14 +37,45 @@ class Game extends GC.Application
 		@score = 0
 		score_text = new TextView
 			superview: @
-			x: 4
+			x: 6
 			y: 4
-			width: Setting.game_width
+			width: Setting.game_width/2
 			height: 20
 			horizontalAlign: "left"
 			text: "00000"
 			size: 24
 			color: '#222222'
+
+		@timer = 60
+		@timer_text = new TextView
+			superview: @
+			x: Setting.game_width/2
+			y: 4
+			width: Setting.game_width/2 - 6
+			height: 20
+			horizontalAlign: "right"
+			text: @timer+""
+			size: 24
+			color: '#222222'
+
+		@tick_time = 0
+
+	update_timer: ->
+		@timer -= 1
+		if @timer <= 0
+			GC.app.engine.stopLoop()
+		@timer_text.setText @timer
+		@timer_text.updateOpts {color: '#db8200'} if @timer < 15
+		@timer_text.updateOpts {color: '#db2300'} if @timer < 10
+			
+
+
+
+	tick: (dt)->
+		@tick_time += dt
+		if @tick_time > 1000
+			@tick_time = 0
+			@update_timer()
 
 
 
