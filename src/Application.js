@@ -39,22 +39,8 @@
         y: 0
       });
       dot_grid.on("score:update", function(count) {
-        var text;
         _this.score += Math.floor(Math.pow(2, count - 1));
-        text = _this.score + "";
-        if (text.length === 1) {
-          text = "0000" + text;
-        }
-        if (text.length === 2) {
-          text = "000" + text;
-        }
-        if (text.length === 3) {
-          text = "00" + text;
-        }
-        if (text.length === 4) {
-          text = "0" + text;
-        }
-        return score_text.setText(text);
+        return score_text.setText(_this.score_in_text(_this.score));
       });
       this.score = 0;
       score_text = new TextView({
@@ -68,6 +54,17 @@
         size: 24,
         color: '#222222'
       });
+      new TextView({
+        superview: this,
+        x: 6,
+        y: 28,
+        width: Setting.game_width / 2,
+        height: 20,
+        horizontalAlign: "left",
+        text: this.score_in_text(this.highest_score()),
+        size: 24,
+        color: '#666666'
+      });
       this.timer = 60;
       this.timer_text = new TextView({
         superview: this,
@@ -80,13 +77,16 @@
         size: 24,
         color: '#222222'
       });
-      return this.tick_time = 0;
+      this.tick_time = 0;
+      return this.is_game_over = false;
     };
 
     Game.prototype.update_timer = function() {
       this.timer -= 1;
       if (this.timer <= 0) {
-        GC.app.engine.stopLoop();
+        this.timer = 0;
+        this.is_game_over = true;
+        this.save_highest_score(this.score);
       }
       this.timer_text.setText(this.timer);
       if (this.timer < 15) {
@@ -99,6 +99,34 @@
           color: '#db2300'
         });
       }
+    };
+
+    Game.prototype.save_highest_score = function(score) {
+      if (score >= this.highest_score()) {
+        return localStorage['game:score:highest'] = score;
+      }
+    };
+
+    Game.prototype.highest_score = function() {
+      return localStorage['game:score:highest'] || 0;
+    };
+
+    Game.prototype.score_in_text = function(score) {
+      var text;
+      text = score + "";
+      if (text.length === 1) {
+        text = "0000" + text;
+      }
+      if (text.length === 2) {
+        text = "000" + text;
+      }
+      if (text.length === 3) {
+        text = "00" + text;
+      }
+      if (text.length === 4) {
+        text = "0" + text;
+      }
+      return text;
     };
 
     Game.prototype.tick = function(dt) {

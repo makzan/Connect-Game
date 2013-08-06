@@ -6,7 +6,7 @@
 
 class Game extends GC.Application
 
-	initUI: -> 
+	initUI: -> 		
 		bg = new View
 			superview: @
 			width: Setting.game_width
@@ -26,13 +26,7 @@ class Game extends GC.Application
 			y: 0
 		dot_grid.on "score:update", (count) =>
 			@score += Math.floor(Math.pow(2, count-1)) # score is 2^(count-1)
-			text = @score + ""
-			text = "0000" + text if text.length == 1
-			text = "000" + text if text.length == 2
-			text = "00" + text if text.length == 3
-			text = "0" + text if text.length == 4
-
-			score_text.setText text
+			score_text.setText @score_in_text @score
 
 		@score = 0
 		score_text = new TextView
@@ -45,6 +39,17 @@ class Game extends GC.Application
 			text: "00000"
 			size: 24
 			color: '#222222'
+
+		new TextView
+			superview: @
+			x: 6
+			y: 28
+			width: Setting.game_width/2
+			height: 20
+			horizontalAlign: "left"
+			text: @score_in_text @highest_score()
+			size: 24
+			color: '#666666'
 
 		@timer = 60
 		@timer_text = new TextView
@@ -60,14 +65,29 @@ class Game extends GC.Application
 
 		@tick_time = 0
 
+		@is_game_over = false
+
 	update_timer: ->
 		@timer -= 1
 		if @timer <= 0
-			GC.app.engine.stopLoop()
+			@timer = 0
+			@is_game_over = true
+			@save_highest_score(@score)
+
 		@timer_text.setText @timer
 		@timer_text.updateOpts {color: '#db8200'} if @timer < 15
 		@timer_text.updateOpts {color: '#db2300'} if @timer < 10
 			
+	save_highest_score: (score) ->		
+		localStorage['game:score:highest'] = score if score >= @highest_score()
+	highest_score: -> localStorage['game:score:highest'] || 0
+	score_in_text: (score) ->
+		text = score + ""
+		text = "0000" + text if text.length == 1
+		text = "000" + text if text.length == 2
+		text = "00" + text if text.length == 3
+		text = "0" + text if text.length == 4
+		return text
 
 
 
